@@ -137,7 +137,7 @@ app.post("/add-note", authenticateToken, async (req, res) => {
     }
 
     try {
-        const note = new noteSchema({
+        const note = new Note({
             title,
             content,
             tags: tags || [],
@@ -151,7 +151,7 @@ app.post("/add-note", authenticateToken, async (req, res) => {
             note,
             message: "Note added sucessfully",
         })
-    } catch { error } {
+    } catch (error) {
         return res.status(500).json({
             error: true,
             message: "Internal server error",
@@ -193,6 +193,26 @@ app.put("/edit-note/:noteId", authenticateToken, async (req, res) => {
         return res.status(500).json({
             error: true,
             message: "Internal server error"
+        })
+    }
+})
+
+// get all notes
+app.get("/get-all-notes", authenticateToken, async (req,res) => {
+    const {user} = req.user;
+
+    try{
+        const notes = await Note.find({userId: user._id}).sort({isPinned: -1});
+
+        return res.json({
+            error:false,
+            notes,
+            message: "All notes retrived sucessfully",
+        })
+    } catch (error) {
+        return res.status(500).json({
+            error: true,
+            message:"failed to fetch all the notes, Internal server error"
         })
     }
 })
