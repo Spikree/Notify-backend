@@ -1,6 +1,6 @@
 import express from 'express';
 import userSchema from './models/user.model.js';
-import noteSchema from './models/note.model.js';
+import Note from './models/note.model.js';
 import bodyParser from 'body-parser';
 import mongoose from 'mongoose';
 import cors from 'cors';
@@ -28,6 +28,7 @@ const port = process.env.PORT || 4000;
 
 import jwt from 'jsonwebtoken'
 import authenticateToken from './utilities.js';
+import noteModel from './models/note.model.js';
 
 
 app.use(cors({ origin: "*" }));
@@ -170,7 +171,7 @@ app.put("/edit-note/:noteId", authenticateToken, async (req, res) => {
     }
 
     try {
-        const note = await noteSchema.findOne({ _id: noteId, userId: user._id });
+        const note = await Note.findOne({ _id: noteId, userId: user._id });
 
         if (!note) {
             return res.status(404).json({ error: true, message: "Note not found" })

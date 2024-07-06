@@ -11,4 +11,5 @@ const noteSchema = new Schema({
     createdOn:{type: Date,default: new Date().getTime()},
 });
 
-export default mongoose.model("Note",noteSchema);
+const Note = mongoose.model("Note", noteSchema);
+export default Note;
