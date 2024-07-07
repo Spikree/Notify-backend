@@ -84,7 +84,6 @@ app.post("/create-account", async (req, res) => {
     })
 })
 
-
 // login
 app.post("/login", async (req, res) => {
     const { email, password } = req.body;
@@ -198,21 +197,53 @@ app.put("/edit-note/:noteId", authenticateToken, async (req, res) => {
 })
 
 // get all notes
-app.get("/get-all-notes", authenticateToken, async (req,res) => {
-    const {user} = req.user;
+app.get("/get-all-notes", authenticateToken, async (req, res) => {
+    const { user } = req.user;
 
-    try{
-        const notes = await Note.find({userId: user._id}).sort({isPinned: -1});
+    try {
+        const notes = await Note.find({ userId: user._id }).sort({ isPinned: -1 });
 
         return res.json({
-            error:false,
+            error: false,
             notes,
             message: "All notes retrived sucessfully",
         })
     } catch (error) {
         return res.status(500).json({
             error: true,
-            message:"failed to fetch all the notes, Internal server error"
+            message: "failed to fetch all the notes, Internal server error"
+        })
+    }
+})
+
+// delete a note
+app.delete("/delete-note/:noteId", authenticateToken, async (req, res) => {
+    const noteId = req.params.noteId;
+    const { user } = req.user;
+
+    try {
+        const note = await Note.findOne({
+            _id: noteId,
+            userId: user._id
+        });
+
+        if (!note) {
+            return res.status(400).json({ error: true, message: "Note not found" });
+        }
+
+        await Note.deleteOne({
+            _id: noteId, userId: user._id
+        });
+
+        return res.json({
+            error: false,
+            message: "Note deleted sucessfully",
+
+        })
+    } catch (error) {
+        return res.status(500).json({
+            error: true,
+            message: "Internal server error"
         })
     }
 })
